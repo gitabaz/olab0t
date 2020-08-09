@@ -1,0 +1,5 @@
+{
+    "bot_username": "myb0t",
+    "channel_list": ["mychannel", "mychannel2", "mychan3"],
+    "oauth_token": "oauth:s3cr3tk3y"
+}
