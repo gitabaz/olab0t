@@ -11,5 +11,6 @@
 int reply_PONG(int sock_fd);
 void parse_msg(char* buf, char* ping, char* chan, char* usr, char* msg, int sock_fd);
 int send_msg(int sock_fd, char* chan, char* msg);
+int parse_command(int sock_fd, char* chan, char* msg, char* usr);
 
 #endif
