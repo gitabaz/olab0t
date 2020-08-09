@@ -21,8 +21,11 @@ void parse_msg(char* buf, char* ping, char* chan, char* usr, char* msg, int sock
         fwrite(msg, 1, strlen(msg), stdout);
         printf("\n");
 
-        if (msg[0] == '!') {
-            parse_command(sock_fd, chan, msg, usr);
+        // Only process commands if they come from my channel
+        if (strcmp(chan, "olabaz") == 0 ) {
+            if (msg[0] == '!') {
+                parse_command(sock_fd, chan, msg, usr);
+            }
         }
 
         

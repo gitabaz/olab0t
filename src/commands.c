@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdbool.h>
 
 #include "handle_msg.h"
 
@@ -15,9 +16,12 @@ int parse_command(int sock_fd, char* chan, char* msg, char* usr) {
         sprintf(response, "@%s https://github.com/gitabaz\n", usr);
     } else if (strcmp(cmd, "olab0t") == 0) {
         sprintf(response, "@%s https://github.com/gitabaz/olab0t\n", usr);
+    } else if (strcmp(cmd, "poggers") == 0) {
+        sprintf(response, "PogChamp Poggers PogChamp Poggers\n");
     } else {
         sprintf(response, "@%s Command not recognized!\n", usr);
     }
+
     bytes_sent = send_msg(sock_fd, chan, response);
 
     return bytes_sent;
