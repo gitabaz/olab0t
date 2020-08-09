@@ -14,6 +14,7 @@ void freebc(bot_config* bc) {
     free(bc);
 }
 
+// TODO: change parsing to use strtok?
 bot_config* bot_config_from_file(const char* const filename) {
     
     FILE* fp = fopen(filename, "r");
