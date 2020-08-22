@@ -33,6 +33,7 @@
 
 void authenticate(bot_config* bc, int sock_fd);
 void join_channels(bot_config* bc, int sock_fd);
+void request_tags(int sock_fd);
 
 int main() {
 
@@ -69,8 +70,8 @@ int main() {
 
     // TODO: make sure we are actually authenticated
     authenticate(bc, sock_fd);
-
     join_channels(bc, sock_fd);
+    /* request_tags(sock_fd); */
 
     char buf[501];
     char ping[6], msg[301], msg_channel[101], msg_user[101];
@@ -79,8 +80,8 @@ int main() {
         bytes_recv = recv(sock_fd, buf, 500, 0);
         if (bytes_recv > 0) {
             parse_msg(buf, ping, msg_channel, msg_user, msg, sock_fd);
+            /* fwrite(buf, 1, bytes_recv, stdout); */
         }
-        /* memset(buf, '\0', 500); // Clear the buffer */
     }
 
     // Clean up
@@ -127,8 +128,30 @@ void authenticate(bot_config* bc, int sock_fd) {
     fwrite(buf, 1, bytes_recv, stdout);
 }
 
+void request_tags(int sock_fd) {
+    char tags[] = "CAP REQ :twitch.tv/tags\n";
+    ssize_t bytes_sent, bytes_recv;
+    char buf[501];
+   
+    bytes_sent = send(sock_fd, tags, strlen(tags), 0);
+    if (bytes_sent < 0) {
+        exit(EXIT_FAILURE);
+    } else {
+        if ((size_t) bytes_sent != strlen(tags)) {
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    bytes_recv = recv(sock_fd, buf, 500, 0);
+    if (bytes_recv <= 0) {
+        puts("Error: could not get tags");
+    } else {
+        fwrite(buf, 1, bytes_recv, stdout);
+    }
+}
+
 void join_channels(bot_config* bc, int sock_fd) {
-    char channel[107]; // 100 char string + extra space to store prefix (`JOIN #`)
+    char channel[110]; // 100 char string + extra space to store prefix (`JOIN #`)
     char buf[501];
     ssize_t bytes_sent, bytes_recv;
 
