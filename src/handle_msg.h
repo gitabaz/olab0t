@@ -36,9 +36,9 @@ int send_msg(int sock_fd, char* chan, char* msg);
 
 // Parsing functions
 void parse_msg(char* buf, message* msg, int sock_fd);
-void parse_tags(char* tags, message* msg);
+int parse_tags(char* tags, message* msg);
 int parse_command(int sock_fd, char* chan, char* msg, char* usr);
-void parse_tag_field_value(char* field, char* value, message* msg);
+int parse_tag_field_value(char* field, char* value, message* msg);
 
 // Print functions
 void print_color_str(char* str, char* color);

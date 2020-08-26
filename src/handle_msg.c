@@ -88,7 +88,9 @@ void parse_msg(char* buf, message* msg, int sock_fd) {
         char delim[] = ";";
         char *token = strtok(tags, delim);
         while(token) {
-            parse_tags(token, msg);
+            if (parse_tags(token, msg) != 0) {
+                printf("---\n%s\n---\n", buf);
+            }
             token = strtok(NULL, delim);
         }
         strcpy(msg->text, message_text);
@@ -136,24 +138,28 @@ int send_msg(int sock_fd, char* chan, char* msg) {
     return bytes_sent;
 }
 
-void parse_tags(char* tags, message* msg) {
+int parse_tags(char* tags, message* msg) {
     char field[110];
     char value[110];
 
     int res = sscanf(tags, "%[^=]=%s", field, value);
+    int parse_error = 0;
     if (res == 2) {
         /* printf("Field: %s\n", field); */
         /* printf("Value: %s\n", value); */
-        parse_tag_field_value(field, value, msg);
+        parse_error = parse_tag_field_value(field, value, msg);
     } else if (res == 1) {
         /* printf("Field: %s\n", field); */
         /* printf("Value: %s\n", "Using default value"); */
-        parse_tag_field_value(field, "NULL", msg);
+        parse_error = parse_tag_field_value(field, "NULL", msg);
     } else {
         printf("Error parsing %s\n", tags);
+        parse_error = -1;
     }
+
+    return parse_error;
 }
-void parse_tag_field_value(char* field, char* value, message* msg){
+int parse_tag_field_value(char* field, char* value, message* msg){
     if (strcmp(field, "@badge-info") == 0){
         strcpy(msg->badge_info, value);
     } else if (strcmp(field, "badges") == 0) {
@@ -197,7 +203,10 @@ void parse_tag_field_value(char* field, char* value, message* msg){
         strcpy(msg->user_type, value);
     } else {
         printf("Unknown field: %s\n", field);
+        return -1;
     }
+
+    return 0;
 }
 
 void print_color_str(char* str, char* color) {
