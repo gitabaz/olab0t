@@ -9,67 +9,27 @@
 
 #define PING "PING "
 #define LEN_RGB (sizeof "255:255:255")
-/* "\033[38:2::255:0:0::m Hello \033[m" */
 
-/* @badge-info=;
- * badges=broadcaster/1;
- * client-nonce=30a76df53b6cf68e021f6abdb8d7cbc4;
- * color=#CC7000;
- * display-name=olabaz;
+/* @badge-info=subscriber/1;
+ * badges=subscriber/0;
+ * client-nonce=dbd1897dc0b6924c7684818a1d6d2225;
+ * color=#D2691E;
+ * display-name=ghoulzylun4tic;
  * emotes=;
  * flags=;
- * id=acacac6b-d1fb-4258-80bf-177adda0636a;
+ * id=32ba33fe-44ff-44e3-ae3d-6ec0c2fe237a;
  * mod=0;
- * room-id=23126828;
- * subscriber=0;
- * tmi-sent-ts=1598055662031;
- * turbo=0;
- * user-id=23126828;
- * user-type= */
-/* :olabaz!olabaz@olabaz.tmi.twitch.tv PRIVMSG #olabaz : test */
-
-/* @badge-info=subscriber/2;
- * badges=subscriber/2,premium/1;
- * client-nonce=cdf59e5902c799a0540e03b70068051a;
- * color=;
- * display-name=Mccannch;
- * emotes=;
- * flags=;
- * id=b21d1938-edfa-4e1f-840e-5b4e5a8d7578;
- * mod=0;
- * room-id=424038378;
+ * reply-parent-display-name=stskyy_;
+ * reply-parent-msg-body=How\sam\sI\styping\swithout\sbeing\ssub;
+ * reply-parent-msg-id=635cd448-e59d-4bf3-997a-8947508607ec;
+ * reply-parent-user-id=496500247;
+ * reply-parent-user-login=stskyy_;
+ * room-id=181224914;
  * subscriber=1;
- * tmi-sent-ts=1598204719735;
+ * tmi-sent-ts=1598472524052;
  * turbo=0;
- * user-id=100274299;
- * user-type= */
-
-/*@badge-info=<badge-info>;badges=<badges>;
- * color=<color>;display-name=<display-name>;
- * emotes=<emotes>;id=<id-of-msg>;
- * mod=<mod>;room-id=<room-id>;
- * subscriber=<subscriber>;tmi-sent-ts=<timestamp>;
- * turbo=<turbo>;user-id=<user-id>;
- * user-type=<user-type> :<user>!<user>@<user>.tmi.twitch.tv PRIVMSG #<channel> :<message> */
-
-// TODO fix issue with emotes and flags having a `:` making it parse the tag,
-// header, text improperly
-
-/* @badge-info=subscriber/10;
- * badges=vip/1,subscriber/3;
- * client-nonce=d48e068c74ef95e7c0c5ed29f010ce05;
- * color=#000000;
- * display-name=mashiroeu;
- * emotes=25:23-27;
- * flags=;
- * id=c508935a-e5ac-48b0-b615-6377308f41a7;
- * mod=0;
- * room-id=162658813;
- * subscriber=1;
- * tmi-sent-ts=1598464701764;
- * turbo=0;
- * user-id=49415004;
- * user-type= :mashiroeu!mashiroeu@mashiroeu.tmi.twitch.tv PRIVMSG #cookielolxx :yeah taco be happy now Kappa */
+ * user-id=557014076;
+ * user-ty */
 
 
 void parse_msg(char* buf, message* msg, int sock_fd) {
@@ -175,16 +135,28 @@ int parse_tag_field_value(char* field, char* value, message* msg){
         } else {
             strcpy(msg->color, value);
         }
+    } else if (strcmp(field, "custom-reward-id") == 0) {
+        strcpy(msg->custom_reward_id, value);
     } else if (strcmp(field, "display-name") == 0) {
         strcpy(msg->display_name, value);
     } else if (strcmp(field, "emotes") == 0) {
         strcpy(msg->emotes, value);
+    } else if (strcmp(field, "emote-only") == 0) {
+        msg->emote_only = atoi(value);
     } else if (strcmp(field, "flags") == 0) {
         strcpy(msg->flags, value);
     } else if (strcmp(field, "id") == 0) {
         strcpy(msg->id, value);
     } else if (strcmp(field, "mod") == 0) {
         msg->mod = (bool) atoi(value);
+    } else if (strcmp(field, "reply-parent-display-name") == 0) {
+        strcpy(msg->reply_parent_display_name, value);
+    } else if (strcmp(field, "reply-parent-msg-body") == 0) {
+        strcpy(msg->reply_parent_msg_body, value);
+    } else if (strcmp(field, "reply-parent-msg-id") == 0) {
+        strcpy(msg->reply_parent_msg_id, value);
+    } else if (strcmp(field, "reply-parent-user-id") == 0) {
+        msg->reply_parent_user_id = atoll(value);
     } else if (strcmp(field, "room-id") == 0) {
         strcpy(msg->room_id, value);
     } else if (strcmp(field, "subscriber") == 0) {

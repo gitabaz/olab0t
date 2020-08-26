@@ -16,11 +16,18 @@ typedef struct message {
     char bits[110];
     char client_nonce[110];
     char color[10];
+    char custom_reward_id[110];
     char display_name[110];
     char emotes[110];
+    int emote_only;
     char flags[110];
     char id[110];
     bool mod;
+    char reply_parent_display_name[110];
+    char reply_parent_msg_body[110];
+    char reply_parent_msg_id[110];
+    long long reply_parent_user_id;
+    char reply_parent_user_login[110];
     char room_id[110];
     char subscriber[110];
     time_t tmi_sent_ts;
