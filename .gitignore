@@ -69,3 +69,5 @@ bin/
 
 # Secret Twitch key
 twitch_oauth.json
+src/compile_commands.json
+src/.clangd/
