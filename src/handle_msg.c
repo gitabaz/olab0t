@@ -76,8 +76,7 @@ void parse_msg(char* buf, message* msg, int sock_fd) {
 
     char tags[501], message_header[110], message_text[501];
     
-    printf("%s\n", buf);
-    sscanf(buf, "%[^:]:%[^:]:%[^\r\n]", tags, message_header, message_text);
+    sscanf(buf, "%s :%[^:]:%[^\r\n]", tags, message_header, message_text);
     /* printf("%s\n", tags); */
     if (strcmp(tags, PING) == 0) {
         /* puts("Found PING...sending PONG"); */
