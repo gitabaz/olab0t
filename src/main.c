@@ -71,15 +71,16 @@ int main() {
     // TODO: make sure we are actually authenticated
     authenticate(bc, sock_fd);
     join_channels(bc, sock_fd);
-    /* request_tags(sock_fd); */
+    request_tags(sock_fd);
 
     char buf[501];
-    char ping[6], msg[301], msg_channel[101], msg_user[101];
     ssize_t bytes_recv;
+    message msg;
+
     while(true) {
         bytes_recv = recv(sock_fd, buf, 500, 0);
         if (bytes_recv > 0) {
-            parse_msg(buf, ping, msg_channel, msg_user, msg, sock_fd);
+            parse_msg(buf, &msg, sock_fd);
             /* fwrite(buf, 1, bytes_recv, stdout); */
         }
     }
@@ -142,7 +143,10 @@ void request_tags(int sock_fd) {
         }
     }
 
+    // TODO wait for tags request to be acknowledge before moving onto parsing
+    // chat messages
     bytes_recv = recv(sock_fd, buf, 500, 0);
+
     if (bytes_recv <= 0) {
         puts("Error: could not get tags");
     } else {
