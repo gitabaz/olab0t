@@ -10,32 +10,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-typedef struct message {
-    char badge_info[110];
-    char badges[110];
-    char bits[110];
-    char client_nonce[110];
-    char color[10];
-    char custom_reward_id[110];
-    char display_name[110];
-    char emotes[110];
-    int emote_only;
-    char flags[110];
-    char id[110];
-    bool mod;
-    char reply_parent_display_name[110];
-    char reply_parent_msg_body[110];
-    char reply_parent_msg_id[110];
-    long long reply_parent_user_id;
-    char reply_parent_user_login[110];
-    char room_id[110];
-    char subscriber[110];
-    time_t tmi_sent_ts;
-    bool turbo;
-    long long user_id;
-    char user_type[110];
-    char text[501];
-} message;
+#include "constants.h"
+#include "message.h"
 
 // Messaging functions
 int reply_PONG(int sock_fd);

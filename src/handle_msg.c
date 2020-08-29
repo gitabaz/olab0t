@@ -6,9 +6,7 @@
 
 #include "handle_msg.h"
 #include "commands.h"
-
-#define PING "PING "
-#define LEN_RGB (sizeof "255:255:255")
+#include "constants.h"
 
 /* @badge-info=subscriber/1;
  * badges=subscriber/0;
@@ -66,8 +64,6 @@ void parse_msg(char* buf, message* msg, int sock_fd) {
         /*         send_msg(sock_fd, chan, response); */
         /*     } */
         /* } */
-
-        
     }
 }
 
@@ -99,8 +95,7 @@ int send_msg(int sock_fd, char* chan, char* msg) {
 }
 
 int parse_tags(char* tags, message* msg) {
-    char field[110];
-    char value[110];
+    char field[BUF_SIZE], value[BUF_SIZE];
 
     int res = sscanf(tags, "%[^=]=%s", field, value);
     int parse_error = 0;

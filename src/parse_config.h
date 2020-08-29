@@ -11,7 +11,7 @@ typedef struct bot_config {
     int size;
 } bot_config;
 
-void freebc(bot_config* bc);
+void free_bc(bot_config* bc);
 bot_config* bot_config_from_file(const char* const filename);
 
 #endif

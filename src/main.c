@@ -7,8 +7,10 @@
 #include <sys/socket.h>
 #include <netdb.h>
 
+#include "message.h"
 #include "parse_config.h"
 #include "handle_msg.h"
+#include "constants.h"
 
 /* Started olab0t... */
 /* :tmi.twitch.tv 001 olab0t :Welcome, GLHF! */
@@ -28,9 +30,6 @@
 /* :olabaz!olabaz@olabaz.tmi.twitch.tv PRIVMSG #olab0t :hello */
 /* :olabaz!olabaz@olabaz.tmi.twitch.tv PRIVMSG #olab0t :hi : */
 
-#define TWITCH_IRC_URL "irc.chat.twitch.tv"
-#define TWITCH_IRC_PORT "6667"
-
 void authenticate(bot_config* bc, int sock_fd);
 void join_channels(bot_config* bc, int sock_fd);
 void request_tags(int sock_fd);
@@ -39,7 +38,7 @@ int main() {
 
     puts("Started olab0t...");
 
-    char* bot_config_fn = "bin/twitch_oauth.json";
+    char* bot_config_fn = "/home/olabaz/Data/Documents/programming/auth/twitch_oauth.json";
 
     bot_config* bc = bot_config_from_file(bot_config_fn);
 
@@ -70,8 +69,8 @@ int main() {
 
     // TODO: make sure we are actually authenticated
     authenticate(bc, sock_fd);
-    join_channels(bc, sock_fd);
     request_tags(sock_fd);
+    join_channels(bc, sock_fd);
 
     char buf[501];
     ssize_t bytes_recv;
@@ -88,7 +87,8 @@ int main() {
     // Clean up
     close(sock_fd);
     freeaddrinfo(serv_info);
-    freebc(bc);
+    free_bc(bc);
+    free_message(msg);
 
     return 0;
 }
@@ -96,7 +96,7 @@ int main() {
 void authenticate(bot_config* bc, int sock_fd) {
     char pass[110], nick[110]; // 100 char strings + extra space to store prefix (`PASS `, `NICK `)
     ssize_t bytes_sent, bytes_recv;
-    char buf[501];
+    char buf[BUF_SIZE];
 
     // In parse config, should we just read in the strings into the proper
     // format so we don't have to sprintf them here?
@@ -121,7 +121,7 @@ void authenticate(bot_config* bc, int sock_fd) {
         }
     }
 
-    bytes_recv = recv(sock_fd, buf, 500, 0);
+    bytes_recv = recv(sock_fd, buf, BUF_SIZE, 0);
     if (bytes_recv <= 0) {
         puts("Error: could not connect");
         exit(EXIT_FAILURE);
@@ -132,7 +132,7 @@ void authenticate(bot_config* bc, int sock_fd) {
 void request_tags(int sock_fd) {
     char tags[] = "CAP REQ :twitch.tv/tags\n";
     ssize_t bytes_sent, bytes_recv;
-    char buf[501];
+    char buf[BUF_SIZE];
    
     bytes_sent = send(sock_fd, tags, strlen(tags), 0);
     if (bytes_sent < 0) {
@@ -143,9 +143,7 @@ void request_tags(int sock_fd) {
         }
     }
 
-    // TODO wait for tags request to be acknowledge before moving onto parsing
-    // chat messages
-    bytes_recv = recv(sock_fd, buf, 500, 0);
+    bytes_recv = recv(sock_fd, buf, BUF_SIZE, 0);
 
     if (bytes_recv <= 0) {
         puts("Error: could not get tags");
@@ -156,7 +154,7 @@ void request_tags(int sock_fd) {
 
 void join_channels(bot_config* bc, int sock_fd) {
     char channel[110]; // 100 char string + extra space to store prefix (`JOIN #`)
-    char buf[501];
+    char buf[BUF_SIZE];
     ssize_t bytes_sent, bytes_recv;
 
     if (bc->capacity == 0) {
@@ -176,11 +174,12 @@ void join_channels(bot_config* bc, int sock_fd) {
             }
         }
 
-        bytes_recv = recv(sock_fd, buf, 500, 0);
+        bytes_recv = recv(sock_fd, buf, BUF_SIZE, 0);
         if (bytes_recv <= 0) {
             printf("Error: could not connect to channel `%s`\n", bc->channel_list[i]);
         }
         fwrite(buf, 1, bytes_recv, stdout);
+
     }
 
 }

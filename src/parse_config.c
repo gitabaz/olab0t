@@ -6,7 +6,7 @@
 
 #include "parse_config.h"
 
-void freebc(bot_config* bc) {
+void free_bc(bot_config* bc) {
     for(int i = 0; i < bc->capacity; i++) {
         free(bc->channel_list[i]);
     }
