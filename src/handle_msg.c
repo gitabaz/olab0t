@@ -137,13 +137,15 @@ int parse_tag_field_value(char* field, char* value, message* msg){
     } else if (strcmp(field, "emotes") == 0) {
         strcpy(msg->emotes, value);
     } else if (strcmp(field, "emote-only") == 0) {
-        msg->emote_only = atoi(value);
+        msg->emote_only = (bool) atoi(value);
     } else if (strcmp(field, "flags") == 0) {
         strcpy(msg->flags, value);
     } else if (strcmp(field, "id") == 0) {
         strcpy(msg->id, value);
     } else if (strcmp(field, "mod") == 0) {
         msg->mod = (bool) atoi(value);
+    } else if (strcmp(field, "msg-id") == 0) {
+        strcpy(msg->msg_id, value);
     } else if (strcmp(field, "reply-parent-display-name") == 0) {
         strcpy(msg->reply_parent_display_name, value);
     } else if (strcmp(field, "reply-parent-msg-body") == 0) {
@@ -152,6 +154,8 @@ int parse_tag_field_value(char* field, char* value, message* msg){
         strcpy(msg->reply_parent_msg_id, value);
     } else if (strcmp(field, "reply-parent-user-id") == 0) {
         msg->reply_parent_user_id = atoll(value);
+    } else if (strcmp(field, "reply-parent-user-login") == 0) {
+        strcpy(msg->reply_parent_user_login, value);
     } else if (strcmp(field, "room-id") == 0) {
         strcpy(msg->room_id, value);
     } else if (strcmp(field, "subscriber") == 0) {
