@@ -1,6 +1,8 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
-int parse_command(int sock_fd, char* chan, char* msg, char* usr);
+#include "message.h"
+
+int parse_command(message* msg, int sock_fd);
 
 #endif

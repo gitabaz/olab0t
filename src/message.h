@@ -30,6 +30,7 @@ typedef struct message {
     long long user_id;
     char* user_type;
     char* text;
+    char* channel;
 } message;
 
 message* new_message();

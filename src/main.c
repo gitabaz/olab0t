@@ -13,24 +13,6 @@
 #include "handle_msg.h"
 #include "constants.h"
 
-/* Started olab0t... */
-/* :tmi.twitch.tv 001 olab0t :Welcome, GLHF! */
-/* :tmi.twitch.tv 002 olab0t :Your host is tmi.twitch.tv */
-/* :tmi.twitch.tv 003 olab0t :This server is rather new */
-/* :tmi.twitch.tv 004 olab0t :- */
-/* :tmi.twitch.tv 375 olab0t :- */
-/* :tmi.twitch.tv 372 olab0t :You are in a maze of twisty passages, all alike. */
-/* :tmi.twitch.tv 376 olab0t :> */
-/* :olab0t!olab0t@olab0t.tmi.twitch.tv JOIN #olabaz */
-/* :olab0t.tmi.twitch.tv 353 olab0t = #olabaz :olab0t */
-/* :olab0t.tmi.twitch.tv 366 olab0t #olabaz :End of /NAMES list */
-/* :olab0t!olab0t@olab0t.tmi.twitch.tv JOIN #olab0t */
-/* :olab0t.tmi.twitch.tv 353 olab0t = #olab0t :olab0t */
-/* :olab0t.tmi.twitch.tv 366 olab0t #olab0t :End of /NAMES list */
-/* :olabaz!olabaz@olabaz.tmi.twitch.tv PRIVMSG #olabaz :yes */
-/* :olabaz!olabaz@olabaz.tmi.twitch.tv PRIVMSG #olab0t :hello */
-/* :olabaz!olabaz@olabaz.tmi.twitch.tv PRIVMSG #olab0t :hi : */
-
 void authenticate(bot_config* bc, int sock_fd);
 void join_channels(bot_config* bc, int sock_fd);
 void request_tags(int sock_fd);
@@ -93,9 +75,6 @@ int main() {
                 flush_msg(&buf, &buf_bytes, full_msg_pos, msg, sock_fd);
             }
         } while (full_msg_pos);
-        /* split_full_msgs(buf, buf_bytes, msg, sock_fd); */
-        /* puts("Partial MESSAGES"); */
-        /* fwrite(temp_buf, 1, bytes_recv, stdout); */
     }
 
 

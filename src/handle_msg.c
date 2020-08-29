@@ -9,27 +9,6 @@
 #include "commands.h"
 #include "constants.h"
 
-/* @badge-info=subscriber/1;
- * badges=subscriber/0;
- * client-nonce=dbd1897dc0b6924c7684818a1d6d2225;
- * color=#D2691E;
- * display-name=ghoulzylun4tic;
- * emotes=;
- * flags=;
- * id=32ba33fe-44ff-44e3-ae3d-6ec0c2fe237a;
- * mod=0;
- * reply-parent-display-name=stskyy_;
- * reply-parent-msg-body=How\sam\sI\styping\swithout\sbeing\ssub;
- * reply-parent-msg-id=635cd448-e59d-4bf3-997a-8947508607ec;
- * reply-parent-user-id=496500247;
- * reply-parent-user-login=stskyy_;
- * room-id=181224914;
- * subscriber=1;
- * tmi-sent-ts=1598472524052;
- * turbo=0;
- * user-id=557014076;
- * user-ty */
-
 ssize_t find_full_msg(char* buf, ssize_t buf_bytes, message* msg, int sock_fd){
     for (ssize_t i = 0; i < buf_bytes; i++) {
         if (buf[i] == '\n') {
@@ -62,55 +41,46 @@ void parse_msg(char* buf, ssize_t buf_bytes, message* msg, int sock_fd) {
         char *token = strtok(tags, delim);
         while(token) {
             if (parse_tags(token, msg) != 0) {
-                /* puts("--- buf ---"); */
-                /* fwrite(buf, 1, buf_bytes, stdout); */
-                /* puts("---"); */
-                /* puts("--- tags ---"); */
-                /* printf("%s", tags); */
-                /* puts("---"); */
+                puts("--- buf ---");
+                fwrite(buf, 1, buf_bytes, stdout);
+                puts("---");
+                puts("--- tags ---");
+                printf("%s", tags);
+                puts("---");
             }
             token = strtok(NULL, delim);
         }
         strcpy(msg->text, message_text);
         print_message(msg);
-        
+
+        sscanf(message_header, "%*[^#]#%s", msg->channel);
+
         // Only process commands if they come from my channel
-        /* if (strcmp(chan, "olabaz") == 0 ) { */
-        /*     if (msg[0] == '!') { */
-        /*         parse_command(sock_fd, chan, msg, usr); */
-        /*     } else if (strcmp(msg, "hello") == 0 || strcmp(msg, "hi") == 0){ */
-        /*         char response[100]; */
-        /*         sprintf(response, "Hi @%s!\n", usr); */
-        /*         send_msg(sock_fd, chan, response); */
-        /*     } */
-        /* } */
+        if (strcmp(msg->channel, "olabaz") == 0) {
+            if (msg->text[0] == '!') {
+                parse_command(msg, sock_fd);
+            } else if (strcmp(msg->text, "hello") == 0 || strcmp(msg->text, "hi") == 0){
+                char response[100];
+                sprintf(response, "Hi @%s!\n", msg->display_name);
+                send_msg(sock_fd, msg->channel, response);
+            }
+        }
     }
 }
 
 int reply_PONG(int sock_fd) {
-
-    /* PING :tmi.twitch.tv */
-
-    char pong[] = "PONG :tmi.twitch.tv\n";
-    int bytes_sent;
-    bytes_sent = send(sock_fd, pong, strlen(pong), 0);
-
-    return bytes_sent;
+    return send(sock_fd, PONG, LEN_PONG, 0);
 }
 
 int send_msg(int sock_fd, char* chan, char* msg) {
 
     /* PRIVMSG #<channel> :This is a sample message */
-
     char *msg_w_header = malloc(12*sizeof(*msg_w_header) + strlen(chan) + strlen(msg));
-
     sprintf(msg_w_header, "PRIVMSG #%s :%s\n", chan, msg);
-    
     int bytes_sent;
     bytes_sent = send(sock_fd, msg_w_header, strlen(msg_w_header), 0);
 
     free(msg_w_header);
-    
     return bytes_sent;
 }
 
@@ -120,18 +90,13 @@ int parse_tags(char* tags, message* msg) {
     int res = sscanf(tags, "%[^=]=%s", field, value);
     int parse_error = 0;
     if (res == 2) {
-        /* printf("Field: %s\n", field); */
-        /* printf("Value: %s\n", value); */
         parse_error = parse_tag_field_value(field, value, msg);
     } else if (res == 1) {
-        /* printf("Field: %s\n", field); */
-        /* printf("Value: %s\n", "Using default value"); */
         parse_error = parse_tag_field_value(field, "NULL", msg);
     } else {
         printf("Error parsing %s\n", tags);
         parse_error = -1;
     }
-
     return parse_error;
 }
 int parse_tag_field_value(char* field, char* value, message* msg){
@@ -196,7 +161,6 @@ int parse_tag_field_value(char* field, char* value, message* msg){
         printf("Unknown field: %s\n", field);
         return -1;
     }
-
     return 0;
 }
 
@@ -247,6 +211,5 @@ char* hex_to_rgb(char* color) {
 
     static char rgb[LEN_RGB];
     sprintf(rgb, "%d:%d:%d", r, g, b);
-
     return rgb;
 }

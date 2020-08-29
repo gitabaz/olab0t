@@ -23,6 +23,7 @@ message* new_message() {
     msg->subscriber = malloc(sizeof(*msg->subscriber) * BUF_SIZE);;
     msg->user_type = malloc(sizeof(*msg->user_type) * BUF_SIZE);
     msg->text = malloc(sizeof(*msg->text) * BUF_SIZE);
+    msg->channel = malloc(sizeof(*msg->channel) * BUF_SIZE);
 
     return msg;
 }
@@ -46,5 +47,6 @@ void free_message(message* msg) {
     free(msg->subscriber);
     free(msg->user_type);
     free(msg->text);
+    free(msg->channel);
     free(msg);
 }

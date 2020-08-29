@@ -22,7 +22,6 @@ ssize_t find_full_msg(char* buf, ssize_t buf_bytes, message* msg, int sock_fd);
 void flush_msg(char** buf, ssize_t* buf_bytes, ssize_t pos_full_msg, message* msg, int sock_fd);
 void parse_msg(char* buf, ssize_t buf_bytes, message* msg, int sock_fd);
 int parse_tags(char* tags, message* msg);
-int parse_command(int sock_fd, char* chan, char* msg, char* usr);
 int parse_tag_field_value(char* field, char* value, message* msg);
 
 // Print functions
