@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 #include <time.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -29,25 +30,44 @@
  * user-id=557014076;
  * user-ty */
 
+ssize_t find_full_msg(char* buf, ssize_t buf_bytes, message* msg, int sock_fd){
+    for (ssize_t i = 0; i < buf_bytes; i++) {
+        if (buf[i] == '\n') {
+            return i;
+        }
+    }
+    return 0;
+}
 
-void parse_msg(char* buf, message* msg, int sock_fd) {
+void flush_msg(char** buf, ssize_t* buf_bytes, ssize_t full_msg_pos, message* msg, int sock_fd) {
+    size_t full_msg_bytes = full_msg_pos + 1;
+    parse_msg(*buf, full_msg_bytes, msg, sock_fd);
+    memmove(*buf, *buf + full_msg_bytes, *buf_bytes - full_msg_bytes);
+    *buf_bytes -= full_msg_bytes;
+}
 
-    char tags[501], message_header[110], message_text[501];
-    
-    sscanf(buf, "%s :%[^:]:%[^\r\n]", tags, message_header, message_text);
-    /* printf("%s\n", tags); */
-    if (strcmp(tags, PING) == 0) {
+void parse_msg(char* buf, ssize_t buf_bytes, message* msg, int sock_fd) {
+
+    char tags[BUF_SIZE], message_header[BUF_SIZE], message_text[BUF_SIZE];
+   
+    if (buf_bytes >= LEN_PING && memcmp(buf, PING, LEN_PING) == 0) {
         /* puts("Found PING...sending PONG"); */
         if(reply_PONG(sock_fd) == 0) {
             puts("Error: could not send PONG");
             exit(EXIT_FAILURE);
         }
     } else {
+        sscanf(buf, "%s :%[^:]:%[^\r\n]", tags, message_header, message_text);
         char delim[] = ";";
         char *token = strtok(tags, delim);
         while(token) {
             if (parse_tags(token, msg) != 0) {
-                printf("---\n%s\n---\n", buf);
+                /* puts("--- buf ---"); */
+                /* fwrite(buf, 1, buf_bytes, stdout); */
+                /* puts("---"); */
+                /* puts("--- tags ---"); */
+                /* printf("%s", tags); */
+                /* puts("---"); */
             }
             token = strtok(NULL, delim);
         }

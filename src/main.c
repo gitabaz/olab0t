@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -42,6 +43,8 @@ int main() {
 
     bot_config* bc = bot_config_from_file(bot_config_fn);
 
+    srand(time(NULL)); // Seed RNG for commands like !roulette
+
     int status;
     struct addrinfo hints;
     struct addrinfo* serv_info;
@@ -72,19 +75,35 @@ int main() {
     request_tags(sock_fd);
     join_channels(bc, sock_fd);
 
-    char buf[501];
-    ssize_t bytes_recv;
-    message msg;
+    char* buf = malloc(sizeof(*buf) * 3 * BUF_SIZE);
+    char* temp_buf = malloc(sizeof(*temp_buf) * 3 * BUF_SIZE);
+    ssize_t bytes_recv = 0, buf_bytes = 0, full_msg_pos = 0;
+    message* msg = new_message();
 
     while(true) {
-        bytes_recv = recv(sock_fd, buf, 500, 0);
+        bytes_recv = recv(sock_fd, temp_buf, 3 * BUF_SIZE, 0);
         if (bytes_recv > 0) {
-            parse_msg(buf, &msg, sock_fd);
-            /* fwrite(buf, 1, bytes_recv, stdout); */
+            memcpy(buf + buf_bytes, temp_buf, bytes_recv);
+            buf_bytes += bytes_recv;
         }
+
+        do {
+            full_msg_pos = find_full_msg(buf, buf_bytes, msg, sock_fd);
+            if (full_msg_pos > 0) {
+                flush_msg(&buf, &buf_bytes, full_msg_pos, msg, sock_fd);
+            }
+        } while (full_msg_pos);
+        /* split_full_msgs(buf, buf_bytes, msg, sock_fd); */
+        /* puts("Partial MESSAGES"); */
+        /* fwrite(temp_buf, 1, bytes_recv, stdout); */
     }
 
+
+
+
     // Clean up
+    free(buf);
+    free(temp_buf);
     close(sock_fd);
     freeaddrinfo(serv_info);
     free_bc(bc);
@@ -182,4 +201,11 @@ void join_channels(bot_config* bc, int sock_fd) {
 
     }
 
+    // Add another call to recv in case we haven't read all the
+    // confirmations for joining channels
+    int bytes_peek = recv(sock_fd, buf, BUF_SIZE, MSG_PEEK);
+    if (bytes_peek > 0) {
+        bytes_recv = recv(sock_fd, buf, BUF_SIZE, 0);
+        fwrite(buf, 1, bytes_recv, stdout);
+    }
 }
